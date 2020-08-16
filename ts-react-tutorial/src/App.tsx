@@ -1,10 +1,15 @@
 import React from 'react';
+import { TodoForm, TodoList } from "./Study/Todos";
+import { TodosContextProvider } from "./Study/contexts/TodoContext";
 
 function App() {
 
     return (
         <div>
-            Hello World !
+            <TodosContextProvider>
+                <TodoForm />
+                <TodoList />
+            </TodosContextProvider>
         </div>
     );
 }
