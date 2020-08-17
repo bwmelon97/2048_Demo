@@ -1,10 +1,13 @@
 # 2048_DEMO
 
+군대에서 코딩이 너무 하고 싶은 나머지 무작정 시작한 프로젝트 :)
 
 
 
+#### 목적
 
-
+* Typescript로 React 프로젝트를 진행하는 것을 익히기
+* React Native 개발 공부 (추후 예정)
 
 
 
@@ -30,13 +33,13 @@
 
 #### 2020년 8월 14일
 
-* Poiemaweb의 typescript 포스팅(https://poiemaweb.com/typescript-introduction)을 통해 typescript 맛보기 진행
+* Poiemaweb의 typescript 포스팅(https://poiemaweb.com/typescript-introduction) 을 통해 typescript 맛보기 진행
 
 
 
 #### 2020년 8월 15일
 
-* Nomad Coder님의 Typescript 강의 (https://nomadcoders.co/typescript-for-beginners/lobby)로 typescript 공부 진행
+* Nomad Coder님의 Typescript 강의 (https://nomadcoders.co/typescript-for-beginners/lobby) 로 typescript 공부 진행
 
 
 
@@ -49,9 +52,9 @@
 
 
 
-#### 202년 8월 17일
+#### 2020년 8월 17일
 
-* velopert님의 **TypeScript 환경에서 Redux를 프로처럼 사용하기** 포스팅 (https://velog.io/@velopert/use-typescript-and-redux-like-a-pro)를 통해 typescript가 적용된 react 프로젝트에 Redux 사용하는 법 공부
+* velopert님의 **TypeScript 환경에서 Redux를 프로처럼 사용하기** 포스팅 (https://velog.io/@velopert/use-typescript-and-redux-like-a-pro) 를 통해 typescript가 적용된 react 프로젝트에 Redux 사용하는 법 공부
 * **Action type** 선언 + **액션 생성 함수** 선언
 * **State type** 선언
 * **Reducer** 작성
@@ -59,10 +62,7 @@
 * **typesafe-actions**로 리덕스 모듈 리팩토링
   * createAction / ActionType / createReducer (object map 방식 / method chainning 방식)
 * 디렉토리 구성
-
-
-
-
+* README.md 업로드
 
 
 
