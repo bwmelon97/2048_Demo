@@ -1,21 +1,24 @@
-// 액션 타입
-const ADD_TODO = 'todos/ADD_TODO' as const;
-const TOGGLE_TODO = 'todos/TOGGLE_TODO' as const;
-const REMOVE_TODO = 'todos/REMOVE_TODO' as const;
+import { 
+    createAction, ActionType, createReducer
+} from 'typesafe-actions';
 
-// 액션 생성 함수
-export const addTodo = (text: string) => ({type: ADD_TODO, payload: text})
-export const toggleTodo = (id: number) => ({type: TOGGLE_TODO, payload: id})
-export const removeTodo = (id: number) => ({type: REMOVE_TODO, payload: id})
+/* 액션 타입 */
+const ADD_TODO = 'todos/ADD_TODO'
+const TOGGLE_TODO = 'todos/TOGGLE_TODO'
+const REMOVE_TODO = 'todos/REMOVE_TODO'
 
-// 액션들의 타입스크립트 타입 준비
-type TodosAction = 
-    ReturnType<typeof addTodo> |
-    ReturnType<typeof toggleTodo> |
-    ReturnType<typeof removeTodo> ;
+/* 액션 생성 함수 */
+export const addTodo = createAction(ADD_TODO)<string>();
+export const toggleTodo = createAction(TOGGLE_TODO)<number>();
+export const removeTodo = createAction(REMOVE_TODO)<number>();
 
 
-// state를 위한 타입 설정
+/* 액션들의 타입스크립트 타입 준비 */
+const actions = {addTodo, toggleTodo, removeTodo};
+type TodosAction = ActionType<typeof actions>;
+
+
+/* state를 위한 타입 설정 */
 export type Todo = {
     id: number;
     text: string;
@@ -24,7 +27,7 @@ export type Todo = {
 
 type TodosState = { todoList: Todo[]};
 
-// 초기 state 설정
+/* 초기 state 설정 */
 const initialState: TodosState = {
     todoList: [
         { id: 1, text: '타입스크립트 배우기', done: true },
@@ -35,41 +38,38 @@ const initialState: TodosState = {
 
 
 /* Reducer */
-export default function todos ( state: TodosState = initialState, action: TodosAction ): TodosState {
-    switch (action.type) {
-        case ADD_TODO: {
-            const nextId: number = Math.max(0, ...state.todoList.map(todo => todo.id) ) + 1;
-            return {
-                ...state,
-                todoList: state.todoList.concat({
-                    id: nextId,
-                    text: action.payload,
-                    done: false
-                })
-            }
+const todos = createReducer<TodosState, TodosAction> (initialState, {
+    [ADD_TODO]: (state, {payload: text}) => {
+        const nextId: number = Math.max(0, ...state.todoList.map(todo => todo.id) ) + 1;
+        return {
+            ...state,
+            todoList: state.todoList.concat({
+                id: nextId,
+                text,
+                done: false
+            })
         }
+    },
 
-        case TOGGLE_TODO: {
-            return {
-                ...state,
-                todoList: state.todoList.map( todo => {
-                    return todo.id === action.payload ? 
-                    {...todo, done: !todo.done} : todo;
-                })
-            }
+    [TOGGLE_TODO]: (state, { payload: id }) => {
+        return {
+            ...state,
+            todoList: state.todoList.map( todo => {
+                return todo.id === id ? 
+                {...todo, done: !todo.done} : todo;
+            })
         }
-
-        case REMOVE_TODO: {
-            return {
-                ...state,
-                todoList: state.todoList.filter( todo => {
-                    return todo.id !== action.payload
-                })
-            }
+    },
+    
+    [REMOVE_TODO]: (state,  {payload: id }) => {
+        return {
+            ...state,
+            todoList: state.todoList.filter( todo => {
+                return todo.id !== id
+            })
         }
-
-        default:
-            return state;
     }
-}
+}) 
 
+
+export default todos;
