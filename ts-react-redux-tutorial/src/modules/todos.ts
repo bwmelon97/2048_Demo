@@ -16,7 +16,7 @@ type TodosAction =
 
 
 // state를 위한 타입 설정
-type Todo = {
+export type Todo = {
     id: number;
     text: string;
     done: boolean;
