@@ -1,9 +1,10 @@
 import React from 'react';
+import GameTable from "./components/GameTable";
 
 function App() {
-  return (
-    <h1> Hello </h1>
-  );
+    return (
+        <GameTable />  
+    );
 }
 
 export default App;
