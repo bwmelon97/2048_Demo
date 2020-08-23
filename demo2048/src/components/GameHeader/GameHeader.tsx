@@ -7,7 +7,6 @@ import { color } from "../../styles/variables";
 /* Styled Components */
 const Container = styled.div`
     padding-top: 120px;
-    height: 200px;
 
     display: flex;
     flex-flow: column nowrap;
