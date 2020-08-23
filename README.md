@@ -68,6 +68,29 @@
 
 
 
+#### 2020년 8월 18일
+
+* 디렉토리 구조 구성 ( **Components / Modules / Hooks / Styles** )  
+* Styles의 variables 에 **colors** 객체 (색 정보를 담는 객체) 생성  
+* **styled-components** 패키지 설치 및 Extension 설정 완료  
+* **GameTable** 컴포넌트 생성 
+* **useWindowSize** Hook 생성  
+
+
+
+#### 2020년 8월 19일
+
+* Basic Component 생성 ( **GameHeader, GameBoard, GameFooter** )  
+
+
+
+#### 2020년 8월 23일
+
+* Basic Styling Components ( **GameHeader, GameBoard** 의 기본적인 스타일링 완료 )  
+
+
+
+
 #### # Todo
 
 * 
