@@ -7,6 +7,7 @@ enum Direction {
     UP = 'UP', DOWN = 'DOWN'
 }
 
+/* 블록 Logic */
 export class Block {
     private readonly i: number;     // Block의 i 인덱스 (세로 위치) 값. 위에서 부터 0
     private readonly j: number;     // Block의 j 인덱스 (가로 위치) 값. 왼쪽에서 부터 0
@@ -33,7 +34,7 @@ export class Block {
 }
 
 
-
+/* 한 Line. Size(default는 4) 크기 만큼의 Block Array의 로직 */
 class BlockLine {
 
     protected readonly order: number;
@@ -142,16 +143,14 @@ class BlockLine {
 
 
     /* 프로퍼티 접근 메서드 */
-    getOrderOfRow = (): number => this.order
-    getBlocksOfRow = (): Block[] => this.blocks
-
+    getOrder = (): number => this.order
+    getBlocks = (): Block[] => this.blocks
 
     /* 방향 키 입력 시, 줄에서 일어나는 일련의 과정을 실행하는 메서드 */
     async handleInputDirectionalKey(direction: Direction): Promise<number> {
         let scoreToAdd: number = 0;
         let isLeftOrUp: boolean = true;
-
-        switch(direction) {
+        switch (direction) {
             case Direction.RIGHT: case Direction.DOWN: 
             isLeftOrUp = false; break; 
         }
@@ -169,62 +168,28 @@ class BlockLine {
 }
 
 
+/* 가로 줄 */
 export class RowLine extends BlockLine {
-
     constructor (order: number, blocks: Block []) {
         super(order, blocks);
     }
 
-    /* 왼쪽 방향키 입력 시 이루어지는 총 과정 */
-    moveLeft = (): Promise<number> => this.handleInputDirectionalKey(Direction.LEFT)
-
-    /* 오른쪽 방향키 입력 시 이루어지는 총 과정 */
-    moveRight = (): Promise<number> => this.handleInputDirectionalKey(Direction.RIGHT)
+    moveLeft = (): Promise<number> => this.handleInputDirectionalKey(Direction.LEFT)    /* 왼쪽 방향키 입력 시 이루어지는 총 과정 */
+    moveRight = (): Promise<number> => this.handleInputDirectionalKey(Direction.RIGHT)  /* 오른쪽 방향키 입력 시 이루어지는 총 과정 */
 }
 
+/* 세로 줄 */
 export class ColumnLine extends BlockLine {
-
     constructor (order: number, blocks: Block []) {
         super(order, blocks);
     }
 
-    /* 왼쪽 방향키 입력 시 이루어지는 총 과정 */
-    moveUp = (): Promise<number> => this.handleInputDirectionalKey(Direction.UP)
-
-    /* 오른쪽 방향키 입력 시 이루어지는 총 과정 */
-    moveDown = (): Promise<number> => this.handleInputDirectionalKey(Direction.DOWN)
+    moveUp = (): Promise<number> => this.handleInputDirectionalKey(Direction.UP)        /* 위쪽 방향키 입력 시 이루어지는 총 과정 */
+    moveDown = (): Promise<number> => this.handleInputDirectionalKey(Direction.DOWN)    /* 아래 방향키 입력 시 이루어지는 총 과정 */
 }
 
 
-/* Test Code */
-
-// const block1 = new Block(0, 0, 2);
-// const block2 = new Block(0, 0, 0);
-// const block3 = new Block(0, 0, 2);
-// const block4 = new Block(0, 0, 4);
-
-// const block5 = new Block(0, 0, 8);
-// const block6 = new Block(0, 0, 8);
-// const block7 = new Block(0, 0, 4);
-// const block8 = new Block(0, 0, 4);
-
-// const row1 = new RowLine(1, [block1, block2, block3, block4]);
-
-// row1.moveLeft()
-// .then( () => {
-//     console.log(row1.getBlocksOfRow().map(block => block.getSize() )) 
-// })
-
-// const col1 = new ColumnLine(1, [block5, block6, block7, block8]);
-
-// col1.moveDown()
-// .then( () => {
-//     console.log(col1.getBlocksOfRow().map(block => block.getSize() )) 
-// })
-
-/*******************************/
-
-
+/* (Size * Size) 크기의 Board에 대한 로직 */
 export class Board {
     private blocks: Block[];
     private rows: RowLine[];
@@ -235,6 +200,7 @@ export class Board {
         const rows: RowLine[] = [];
         const cols: ColumnLine[] = [];
 
+        /* Board의 사이즈 만큼의 Block 생성 후 blocks에 저장 */
         for (let i = 0; i < size; i++) {
             for (let j = 0; j < size; j++) {
                 const block = new Block(i, j, 0);
@@ -242,6 +208,7 @@ export class Board {
             }
         }
 
+        /* blocks에서 order에 맞는 line의 블록을 찾아서 Block[] Array를 만들고, 각각을 rows, cols에 저장 */
         for (let idx = 0; idx < size; idx++) {
             const blocksInRow: Block[] = blocks.filter(block => block.getIIdx() === idx);
             const blocksInCol: Block[] = blocks.filter(block => block.getJIdx() === idx);
@@ -253,9 +220,13 @@ export class Board {
         this.blocks = blocks;
         this.rows = rows;
         this.cols = cols;
+    }
 
-        this.randomlyLoadBlock();
-        this.randomlyLoadBlock();
+    /* board를 초기화 상태를 만드는 메서드.
+       모든 블럭을 0으로 만든 다음, randomlyLoadBlock을 2회 실행 */
+    async initBoard(): Promise<void> {
+        this.blocks.forEach(block =>  block.initBlock());   // Promise 형식의 비동기 문법은 아니지만, 처리속도가 빨라서 인지 뒤의 코드보다 늦게 실행된 적이 없다.
+        await this.randomlyLoadBlock(2); 
     }
 
     /* 프로퍼티 접근 함수 */
@@ -263,24 +234,29 @@ export class Board {
     getRows = (): RowLine[] => this.rows;
     getCols = (): ColumnLine[] => this.cols;
 
-
-    /* Board의 사이즈가 0인 블록 중 임의의 하나에 2를 넣는 메서드 */
-    randomlyLoadBlock(): Promise<void> {
+    /* Board의 사이즈가 0인 블록 중 임의의 하나에 2를 넣는 메서드 
+       count가 있는 경우, 해당 숫자 만큼 해당 기능을 실행 */
+    randomlyLoadBlock( count?: number ): Promise<void> {
         return new Promise((resolve, reject) => {
             const emptyBlocks: Block[] = this.blocks.filter(block => block.getSize() === 0);
 
-            if ( emptyBlocks.length > 0 ) {
-                const ramdomIdx: number = Math.floor(Math.random() * emptyBlocks.length);
-                const seletedBlock: Block = emptyBlocks[ramdomIdx];
-                seletedBlock.loadBlock();
-                resolve();
+            const loadBlock = ():void => {
+                if ( emptyBlocks.length > 0 ) {
+                    const selectedIdx: number = Math.floor(Math.random() * emptyBlocks.length);
+                    const seletedBlock: Block = emptyBlocks[selectedIdx];
+                    seletedBlock.loadBlock();
+                    emptyBlocks.splice(selectedIdx, 1);
+                }
+
+                /* 빈 칸이 없는 경우 */
+                else {
+                    console.error('더 이상 빈 칸이 없습니다.');
+                    reject();
+                }
             }
 
-            /* 빈 칸이 없는 경우 */
-            else {
-                console.log('더 이상 빈 칸이 없습니다.');
-                resolve();
-            }
+            do loadBlock(); while ( count && --count );
+            resolve();
         })
     }
 
@@ -289,6 +265,7 @@ export class Board {
     moveUp = (): Promise<number> => this.handleInputDirectionalKey(Direction.UP)
     moveDown = (): Promise<number> => this.handleInputDirectionalKey(Direction.DOWN)
 
+    /* 방향키 입력 시, rows 또는 cols의 모든 line를 각각 해당 move 함수를 실행 시키고, random Load를 1회 실행 */
     async handleInputDirectionalKey( direction: Direction ): Promise<number> {
         let scoreToAdd: number = 0;
         let movePromise: Promise<number[]>;
@@ -318,78 +295,3 @@ export class Board {
         return scoreToAdd;
     }
 }
-
-
-// const board = new Board();
-
-// console.log( board.getBlocks().map(block => {
-//     return `${block.getSize()}`
-// }) );
-
-// board.moveLeft().then(() => {
-//     console.log( board.getBlocks().map(block => {
-//         return `${block.getSize()}`
-//     }) );
-
-//     board.moveLeft().then(() => {
-//         console.log( board.getBlocks().map(block => {
-//             return `${block.getSize()}`
-//         }) );
-
-//         board.moveLeft().then(() => {
-//             console.log( board.getBlocks().map(block => {
-//                 return `${block.getSize()}`
-//             }) );
-
-//             board.moveRight().then(() => {
-//                 console.log( board.getBlocks().map(block => {
-//                     return `${block.getSize()}`
-//                 }) );
-
-//                 board.moveUp().then(() => {
-//                     console.log( board.getBlocks().map(block => {
-//                         return `${block.getSize()}`
-//                     }) );
-
-//                     board.moveDown().then(() => {
-//                         console.log( board.getBlocks().map(block => {
-//                             return `${block.getSize()}`
-//                         }) );
-//                     })
-//                 })
-//             })
-//         })
-//     })
-// })
-
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-
-// board.randomlyLoadBlock();
-
-// console.log( board.getBlocks().map(block => {
-//     // return `${block.getIIdx()} ${block.getJIdx()} ${block.getSize()}`
-//     return `${block.getSize()}`
-// }) );
-
-// console.log( board.getRows().map(row => {
-//     return `${row.getOrderOfRow()} ${row.getBlocksOfRow().map(block => block.getSize())}`
-// }) )
-
-// console.log( board.getCols().map(col => {
-//     return `${col.getOrderOfRow()} ${col.getBlocksOfRow().map(block => block.getSize())}`
-// }) )
