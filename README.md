@@ -93,6 +93,24 @@
 
 
 
+#### 2020년 8월 28일
+
+* create class **Block, BlockLine** (블록, 한 줄의 블록 Array 로직 클래스 생성)
+* implement method **combineSameNumber, PushBlocks** (같은 숫자 합치기, 블록 몰아넣기 기능 구현)
+* handle moveFunc with **async** (비동기 처리를 이용해, 방향키 입력 시 헨들링 하는 메서드 구현. combine후 push 작동)
+
+
+
+#### 2020년 8월 29일
+
+* refactoring class BlockLine
+* create class **Board** & implement constructor
+* implement method **randomlyLoadBlock** (임의의 빈 칸에 숫자 2를 load하는 메서드)
+* implement method **initBoard**
+* implement **handling methods of input directional keys** (방향키 입력 이벤트를 헨들링하는 모든 메서드 구현)
+* add comments
+
+
 
 #### # Todo
 
