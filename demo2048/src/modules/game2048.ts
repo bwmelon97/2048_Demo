@@ -30,23 +30,33 @@ export class Block {
 
 class BlockLine {
 
+    protected readonly order: number;
+    protected blocks: Block [];
+
+    constructor (order: number, blocks: Block []) {
+        this.order = order;
+        this.blocks = blocks;
+    }
+
+    /* Static Methods */
+
     /* [1단계] 같은 숫자 합치기 */
-    static combineSameNumber (isLeftOrDown: boolean, blocks: Block[]): Promise<number> {
+    static combineSameNumber (isLeftOrUp: boolean, blocks: Block[]): Promise<number> {
         return new Promise<number> ( (resolve, reject) => {
             let scoreToAdd: number = 0;
 
             /* 반복문 조건 변수 및 함수 */
-            let subjectIdx: number = isLeftOrDown ? 0 : SIZE_OF_BOARD - 1;      // 비교 기준이 되는 블럭(합쳐질 때 2배 값을 갖는 블럭)의 인덱스
+            let subjectIdx: number = isLeftOrUp ? 0 : SIZE_OF_BOARD - 1;      // 비교 기준이 되는 블럭(합쳐질 때 2배 값을 갖는 블럭)의 인덱스
 
-            const conditionFunc = isLeftOrDown ? 
+            const conditionFunc = isLeftOrUp ? 
             (subjectIdx: number): boolean => subjectIdx < SIZE_OF_BOARD - 1 :   // 0 ~ 끝에서 2번째
             (subjectIdx: number): boolean => subjectIdx > 0 ;                   // 끝 ~ 시작에서 2번째
 
-            const getNextIdx = isLeftOrDown ? (idx: number) => idx + 1 : (idx: number) => idx - 1; 
+            const getNextIdx = isLeftOrUp ? (idx: number) => idx + 1 : (idx: number) => idx - 1; 
 
 
             /* 반복문 내에서 알맞은 objIdx인지 확인하는 메서드 */
-            const isValidObjIdx = isLeftOrDown ? 
+            const isValidObjIdx = isLeftOrUp ? 
             (objectIdx: number): boolean => objectIdx < SIZE_OF_BOARD :
             (objectIdx: number): boolean => objectIdx >= 0 ;
 
@@ -85,20 +95,20 @@ class BlockLine {
     }
 
     /* [2단계] 모든 블럭을 방향키 방향으로 몰아 넣기 */
-    static pushBlocks (isLeftOrDown: boolean, blocks: Block[]): Promise<void> {
+    static pushBlocks (isLeftOrUp: boolean, blocks: Block[]): Promise<void> {
         return new Promise((resolve, reject) => {
 
             /* 반복문 조건 변수 및 함수 */
-            let subjectIdx: number = isLeftOrDown ? 1 : SIZE_OF_BOARD - 2;      // 제자리를 찾고자 하는 블록의 idx
+            let subjectIdx: number = isLeftOrUp ? 1 : SIZE_OF_BOARD - 2;      // 제자리를 찾고자 하는 블록의 idx
 
-            const conditionFunc = isLeftOrDown ? 
+            const conditionFunc = isLeftOrUp ? 
             (subjectIdx: number): boolean => subjectIdx < SIZE_OF_BOARD :       // 앞에서 2번 째 ~ 끝
             (subjectIdx: number): boolean => subjectIdx >= 0 ;                  // 끝에서 2번 째 ~ 0
 
-            const getNextIdx = isLeftOrDown ? (idx: number) => idx + 1 : (idx: number) => idx - 1; 
-            const getPrevIdx = isLeftOrDown ? (idx: number) => idx - 1 : (idx: number) => idx + 1;
+            const getNextIdx = isLeftOrUp ? (idx: number) => idx + 1 : (idx: number) => idx - 1; 
+            const getPrevIdx = isLeftOrUp ? (idx: number) => idx - 1 : (idx: number) => idx + 1;
 
-            const isValidObjIdx = isLeftOrDown ? 
+            const isValidObjIdx = isLeftOrUp ? 
             (objectIdx: number): boolean => objectIdx >= 0 :
             (objectIdx: number): boolean => objectIdx < SIZE_OF_BOARD ;
 
@@ -124,40 +134,19 @@ class BlockLine {
         })
     }
 
-}
-
-
-export class RowLine extends BlockLine {
-    private readonly order: number;
-    private blocks: Block [];
-
-    constructor (order: number, blocks: Block []) {
-        super();
-        this.order = order;
-        this.blocks = blocks;
-    }
 
     /* 프로퍼티 접근 메서드 */
     getOrderOfRow = (): number => this.order
     getBlocksOfRow = (): Block[] => this.blocks
 
 
-    /* 왼쪽 방향키 입력 시 이루어지는 총 과정 */
-    moveLeft(): Promise<number> {
-        return this.handleInputDirectionalKey(true);
-    }
-
-    /* 오른쪽 방향키 입력 시 이루어지는 총 과정 */
-    moveRight(): Promise<number> {
-        return this.handleInputDirectionalKey(false);
-    }
-
-    async handleInputDirectionalKey(isLeftOrDown: boolean): Promise<number> {
+    /* 방향 키 입력 시, 줄에서 일어나는 일련의 과정을 실행하는 메서드 */
+    async handleInputDirectionalKey(isLeftOrUp: boolean): Promise<number> {
         let scoreToAdd: number = 0;
 
         try {
-            scoreToAdd = await BlockLine.combineSameNumber(isLeftOrDown, this.blocks);
-            await BlockLine.pushBlocks(isLeftOrDown, this.blocks); 
+            scoreToAdd = await BlockLine.combineSameNumber(isLeftOrUp, this.blocks);
+            await BlockLine.pushBlocks(isLeftOrUp, this.blocks); 
         } catch (error) {
             console.error('An error occurs on [handleInputDirectionalKey()]')
         }
@@ -168,13 +157,138 @@ export class RowLine extends BlockLine {
 }
 
 
-const block1 = new Block(0, 0, 8);
-const block2 = new Block(0, 0, 8);
-const block3 = new Block(0, 0, 4);
-const block4 = new Block(0, 0, 4);
-const row1 = new RowLine(1, [block1, block2, block3, block4]);
+export class RowLine extends BlockLine {
 
-row1.moveLeft()
-.then( () => {
-    console.log(row1.getBlocksOfRow().map(block => block.getSize() )) 
-})
+    constructor (order: number, blocks: Block []) {
+        super(order, blocks);
+    }
+
+    /* 왼쪽 방향키 입력 시 이루어지는 총 과정 */
+    moveLeft(): Promise<number> {
+        return this.handleInputDirectionalKey(true);
+    }
+
+    /* 오른쪽 방향키 입력 시 이루어지는 총 과정 */
+    moveRight(): Promise<number> {
+        return this.handleInputDirectionalKey(false);
+    }
+}
+
+export class ColumnLine extends BlockLine {
+
+    constructor (order: number, blocks: Block []) {
+        super(order, blocks);
+    }
+
+    /* 왼쪽 방향키 입력 시 이루어지는 총 과정 */
+    moveUp(): Promise<number> {
+        return this.handleInputDirectionalKey(true);
+    }
+
+    /* 오른쪽 방향키 입력 시 이루어지는 총 과정 */
+    moveDown(): Promise<number> {
+        return this.handleInputDirectionalKey(false);
+    }
+}
+
+
+/* Test Code */
+
+// const block1 = new Block(0, 0, 8);
+// const block2 = new Block(0, 0, 8);
+// const block3 = new Block(0, 0, 4);
+// const block4 = new Block(0, 0, 4);
+
+// const block5 = new Block(0, 0, 8);
+// const block6 = new Block(0, 0, 8);
+// const block7 = new Block(0, 0, 4);
+// const block8 = new Block(0, 0, 4);
+
+// const row1 = new RowLine(1, [block1, block2, block3, block4]);
+
+// row1.moveLeft()
+// .then( () => {
+//     console.log(row1.getBlocksOfRow().map(block => block.getSize() )) 
+// })
+
+// const col1 = new ColumnLine(1, [block5, block6, block7, block8]);
+
+// col1.moveDown()
+// .then( () => {
+//     console.log(col1.getBlocksOfRow().map(block => block.getSize() )) 
+// })
+
+/*******************************/
+
+
+export class Board {
+    private blocks: Block[];
+    private rows: RowLine[];
+    private cols: ColumnLine[];
+
+    constructor (size = SIZE_OF_BOARD) {
+        const blocks: Block[] = [];
+        const rows: RowLine[] = [];
+        const cols: ColumnLine[] = [];
+
+        for (let i = 0; i < size; i++) {
+            for (let j = 0; j < size; j++) {
+                const block = new Block(i, j, 0);
+                blocks.push(block);
+            }
+        }
+
+        for (let idx = 0; idx < size; idx++) {
+            const blocksInRow: Block[] = blocks.filter(block => block.getIIdx() === idx);
+            const blocksInCol: Block[] = blocks.filter(block => block.getJIdx() === idx);
+
+            rows.push( new RowLine(idx, blocksInRow) );
+            cols.push( new ColumnLine(idx, blocksInCol) );
+        }
+
+        this.blocks = blocks;
+        this.rows = rows;
+        this.cols = cols;
+    }
+
+    static randomlyLoadBlock(blocks: Block[]): void {
+
+    }
+
+    /* 프로퍼티 접근 함수 */
+    getBlocks = (): Block[] => this.blocks;
+    getRows = (): RowLine[] => this.rows;
+    getCols = (): ColumnLine[] => this.cols;
+
+
+    moveLeft(): number {
+        return 0;
+    }
+
+    moveRight(): number {
+        return 0;
+    }
+
+    moveUp(): number {
+        return 0;
+    }
+
+    moveDown(): number {
+        return 0;
+    }
+}
+
+
+const board = new Board();
+
+console.log( board.getBlocks().map(block => {
+    return `${block.getIIdx()} ${block.getJIdx()} ${block.getSize()}`
+}) );
+
+console.log( board.getRows().map(row => {
+    return `${row.getOrderOfRow()} ${row.getBlocksOfRow().map(block => block.getSize())}`
+}) )
+
+console.log( board.getCols().map(col => {
+    return `${col.getOrderOfRow()} ${col.getBlocksOfRow().map(block => block.getSize())}`
+}) )
