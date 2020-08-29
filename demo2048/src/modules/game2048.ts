@@ -1,5 +1,11 @@
 const SIZE_OF_BOARD = 4 as const;
 
+enum Direction {
+    /* Row Direction */
+    LEFT = 'LEFT', RIGHT = 'RIGHT',
+    /* Column Direction */
+    UP = 'UP', DOWN = 'DOWN'
+}
 
 export class Block {
     private readonly i: number;     // Block의 i 인덱스 (세로 위치) 값. 위에서 부터 0
@@ -46,7 +52,7 @@ class BlockLine {
             let scoreToAdd: number = 0;
 
             /* 반복문 조건 변수 및 함수 */
-            let subjectIdx: number = isLeftOrUp ? 0 : SIZE_OF_BOARD - 1;      // 비교 기준이 되는 블럭(합쳐질 때 2배 값을 갖는 블럭)의 인덱스
+            let subjectIdx: number = isLeftOrUp ? 0 : SIZE_OF_BOARD - 1;        // 비교 기준이 되는 블럭(합쳐질 때 2배 값을 갖는 블럭)의 인덱스
 
             const conditionFunc = isLeftOrUp ? 
             (subjectIdx: number): boolean => subjectIdx < SIZE_OF_BOARD - 1 :   // 0 ~ 끝에서 2번째
@@ -141,8 +147,14 @@ class BlockLine {
 
 
     /* 방향 키 입력 시, 줄에서 일어나는 일련의 과정을 실행하는 메서드 */
-    async handleInputDirectionalKey(isLeftOrUp: boolean): Promise<number> {
+    async handleInputDirectionalKey(direction: Direction): Promise<number> {
         let scoreToAdd: number = 0;
+        let isLeftOrUp: boolean = true;
+
+        switch(direction) {
+            case Direction.RIGHT: case Direction.DOWN: 
+            isLeftOrUp = false; break; 
+        }
 
         try {
             scoreToAdd = await BlockLine.combineSameNumber(isLeftOrUp, this.blocks);
@@ -165,12 +177,12 @@ export class RowLine extends BlockLine {
 
     /* 왼쪽 방향키 입력 시 이루어지는 총 과정 */
     moveLeft(): Promise<number> {
-        return this.handleInputDirectionalKey(true);
+        return this.handleInputDirectionalKey(Direction.LEFT);
     }
 
     /* 오른쪽 방향키 입력 시 이루어지는 총 과정 */
     moveRight(): Promise<number> {
-        return this.handleInputDirectionalKey(false);
+        return this.handleInputDirectionalKey(Direction.RIGHT);
     }
 }
 
@@ -182,12 +194,12 @@ export class ColumnLine extends BlockLine {
 
     /* 왼쪽 방향키 입력 시 이루어지는 총 과정 */
     moveUp(): Promise<number> {
-        return this.handleInputDirectionalKey(true);
+        return this.handleInputDirectionalKey(Direction.UP);
     }
 
     /* 오른쪽 방향키 입력 시 이루어지는 총 과정 */
     moveDown(): Promise<number> {
-        return this.handleInputDirectionalKey(false);
+        return this.handleInputDirectionalKey(Direction.DOWN);
     }
 }
 
@@ -249,10 +261,9 @@ export class Board {
         this.blocks = blocks;
         this.rows = rows;
         this.cols = cols;
-    }
 
-    static randomlyLoadBlock(blocks: Block[]): void {
-
+        this.randomlyLoadBlock();
+        this.randomlyLoadBlock();
     }
 
     /* 프로퍼티 접근 함수 */
@@ -261,20 +272,81 @@ export class Board {
     getCols = (): ColumnLine[] => this.cols;
 
 
-    moveLeft(): number {
-        return 0;
+    /* Board의 사이즈가 0인 블록 중 임의의 하나에 2를 넣는 메서드 */
+    randomlyLoadBlock(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            const emptyBlocks: Block[] = this.blocks.filter(block => block.getSize() === 0);
+
+            if ( emptyBlocks.length > 0 ) {
+                const ramdomIdx: number = Math.floor(Math.random() * emptyBlocks.length);
+                const seletedBlock: Block = emptyBlocks[ramdomIdx];
+                seletedBlock.loadBlock();
+                resolve();
+            }
+
+            /* 빈 칸이 없는 경우 */
+            else {
+                console.log('더 이상 빈 칸이 없습니다.');
+                resolve();
+            }
+        })
     }
 
-    moveRight(): number {
-        return 0;
+
+    moveLeft(): Promise<number> {
+        return this.handleInputDirectionalKey(Direction.LEFT);
     }
 
-    moveUp(): number {
-        return 0;
+    moveRight(): Promise<number> {
+        return this.handleInputDirectionalKey(Direction.RIGHT);
     }
 
-    moveDown(): number {
-        return 0;
+    moveUp(): Promise<number> {
+        return this.handleInputDirectionalKey(Direction.UP);
+    }
+
+    moveDown(): Promise<number> {
+        return this.handleInputDirectionalKey(Direction.DOWN);
+    }
+
+    async handleInputDirectionalKey( direction: Direction ): Promise<number> {
+        let scoreToAdd: number = 0;
+        // let movePromise: Promise<number[]>;
+
+        switch (direction) {
+
+            case Direction.LEFT:
+                // movePromise = Promise.all(this.rows.map(row => row.moveLeft()))
+                await Promise.all(this.rows.map(row => { 
+                    console.log(row.getBlocksOfRow().map(block => block.getSize()));
+
+                    row.moveLeft()
+
+                    console.log(row.getBlocksOfRow().map(block => block.getSize()));
+
+
+                    return row.moveLeft() 
+                }))
+                .then( values => values.forEach( value => scoreToAdd += value ));
+                break;
+
+            // case Direction.RIGHT:
+            //     movePromise = Promise.all(this.rows.map(row => row.moveRight()));
+            //     break;
+
+            // case Direction.UP:
+            //     movePromise = Promise.all(this.cols.map(col => col.moveUp()));
+            //     break;
+
+            // case Direction.DOWN:
+            //     movePromise = Promise.all(this.cols.map(col => col.moveDown()));
+            //     break;
+        }
+
+        // await movePromise.then( values => values.forEach( value => scoreToAdd += value ));
+        
+        await this.randomlyLoadBlock();
+        return scoreToAdd;
     }
 }
 
@@ -282,13 +354,44 @@ export class Board {
 const board = new Board();
 
 console.log( board.getBlocks().map(block => {
-    return `${block.getIIdx()} ${block.getJIdx()} ${block.getSize()}`
+    // return `${block.getIIdx()} ${block.getJIdx()} ${block.getSize()}`
+    return `${block.getSize()}`
 }) );
 
-console.log( board.getRows().map(row => {
-    return `${row.getOrderOfRow()} ${row.getBlocksOfRow().map(block => block.getSize())}`
-}) )
+board.moveLeft();
 
-console.log( board.getCols().map(col => {
-    return `${col.getOrderOfRow()} ${col.getBlocksOfRow().map(block => block.getSize())}`
-}) )
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+
+// console.log( board.getBlocks().map(block => {
+//     return `${block.getSize()}`
+// }) );
+
+// board.randomlyLoadBlock();
+
+// console.log( board.getBlocks().map(block => {
+//     // return `${block.getIIdx()} ${block.getJIdx()} ${block.getSize()}`
+//     return `${block.getSize()}`
+// }) );
+
+// console.log( board.getRows().map(row => {
+//     return `${row.getOrderOfRow()} ${row.getBlocksOfRow().map(block => block.getSize())}`
+// }) )
+
+// console.log( board.getCols().map(col => {
+//     return `${col.getOrderOfRow()} ${col.getBlocksOfRow().map(block => block.getSize())}`
+// }) )
