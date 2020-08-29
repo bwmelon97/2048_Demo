@@ -10,6 +10,8 @@
 
 * Typescript로 React 프로젝트를 진행하는 것을 익히기
 * React Native 개발 공부 (추후 예정)
+* CSS 애니메이션 효과 적용
+* 정사각형 map 외에도 다양한 Board의 2048 제작
 
 
 
