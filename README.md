@@ -9,6 +9,7 @@
 #### 목적
 
 * Typescript로 React 프로젝트를 진행하는 것을 익히기
+* 2048 Logic(알고리즘)을 구현할 때 사용되는 javascript(typescript)의 비동기 처리 익히기  
 * React Native 개발 공부 (추후 예정)
 * CSS 애니메이션 효과 적용
 * 정사각형 map 외에도 다양한 Board의 2048 제작
