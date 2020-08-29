@@ -176,14 +176,10 @@ export class RowLine extends BlockLine {
     }
 
     /* 왼쪽 방향키 입력 시 이루어지는 총 과정 */
-    moveLeft(): Promise<number> {
-        return this.handleInputDirectionalKey(Direction.LEFT);
-    }
+    moveLeft = (): Promise<number> => this.handleInputDirectionalKey(Direction.LEFT)
 
     /* 오른쪽 방향키 입력 시 이루어지는 총 과정 */
-    moveRight(): Promise<number> {
-        return this.handleInputDirectionalKey(Direction.RIGHT);
-    }
+    moveRight = (): Promise<number> => this.handleInputDirectionalKey(Direction.RIGHT)
 }
 
 export class ColumnLine extends BlockLine {
@@ -193,22 +189,18 @@ export class ColumnLine extends BlockLine {
     }
 
     /* 왼쪽 방향키 입력 시 이루어지는 총 과정 */
-    moveUp(): Promise<number> {
-        return this.handleInputDirectionalKey(Direction.UP);
-    }
+    moveUp = (): Promise<number> => this.handleInputDirectionalKey(Direction.UP)
 
     /* 오른쪽 방향키 입력 시 이루어지는 총 과정 */
-    moveDown(): Promise<number> {
-        return this.handleInputDirectionalKey(Direction.DOWN);
-    }
+    moveDown = (): Promise<number> => this.handleInputDirectionalKey(Direction.DOWN)
 }
 
 
 /* Test Code */
 
-// const block1 = new Block(0, 0, 8);
-// const block2 = new Block(0, 0, 8);
-// const block3 = new Block(0, 0, 4);
+// const block1 = new Block(0, 0, 2);
+// const block2 = new Block(0, 0, 0);
+// const block3 = new Block(0, 0, 2);
 // const block4 = new Block(0, 0, 4);
 
 // const block5 = new Block(0, 0, 8);
@@ -292,94 +284,100 @@ export class Board {
         })
     }
 
-
-    moveLeft(): Promise<number> {
-        return this.handleInputDirectionalKey(Direction.LEFT);
-    }
-
-    moveRight(): Promise<number> {
-        return this.handleInputDirectionalKey(Direction.RIGHT);
-    }
-
-    moveUp(): Promise<number> {
-        return this.handleInputDirectionalKey(Direction.UP);
-    }
-
-    moveDown(): Promise<number> {
-        return this.handleInputDirectionalKey(Direction.DOWN);
-    }
+    moveLeft = (): Promise<number> => this.handleInputDirectionalKey(Direction.LEFT)
+    moveRight = (): Promise<number> => this.handleInputDirectionalKey(Direction.RIGHT)
+    moveUp = (): Promise<number> => this.handleInputDirectionalKey(Direction.UP)
+    moveDown = (): Promise<number> => this.handleInputDirectionalKey(Direction.DOWN)
 
     async handleInputDirectionalKey( direction: Direction ): Promise<number> {
         let scoreToAdd: number = 0;
-        // let movePromise: Promise<number[]>;
+        let movePromise: Promise<number[]>;
 
+        /* 블록 이동 */
         switch (direction) {
-
             case Direction.LEFT:
-                // movePromise = Promise.all(this.rows.map(row => row.moveLeft()))
-                await Promise.all(this.rows.map(row => { 
-                    console.log(row.getBlocksOfRow().map(block => block.getSize()));
-
-                    row.moveLeft()
-
-                    console.log(row.getBlocksOfRow().map(block => block.getSize()));
-
-
-                    return row.moveLeft() 
-                }))
-                .then( values => values.forEach( value => scoreToAdd += value ));
+                movePromise = Promise.all(this.rows.map(row => row.moveLeft()))
                 break;
 
-            // case Direction.RIGHT:
-            //     movePromise = Promise.all(this.rows.map(row => row.moveRight()));
-            //     break;
+            case Direction.RIGHT:
+                movePromise = Promise.all(this.rows.map(row => row.moveRight()));
+                break;
 
-            // case Direction.UP:
-            //     movePromise = Promise.all(this.cols.map(col => col.moveUp()));
-            //     break;
+            case Direction.UP:
+                movePromise = Promise.all(this.cols.map(col => col.moveUp()));
+                break;
 
-            // case Direction.DOWN:
-            //     movePromise = Promise.all(this.cols.map(col => col.moveDown()));
-            //     break;
+            case Direction.DOWN:
+                movePromise = Promise.all(this.cols.map(col => col.moveDown()));
+                break;
         }
+        await movePromise.then( values => values.forEach( value => scoreToAdd += value ));
 
-        // await movePromise.then( values => values.forEach( value => scoreToAdd += value ));
-        
+        /* 새로운 2 생성 */
         await this.randomlyLoadBlock();
         return scoreToAdd;
     }
 }
 
 
-const board = new Board();
-
-console.log( board.getBlocks().map(block => {
-    // return `${block.getIIdx()} ${block.getJIdx()} ${block.getSize()}`
-    return `${block.getSize()}`
-}) );
-
-board.moveLeft();
-
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
-// board.randomlyLoadBlock();
+// const board = new Board();
 
 // console.log( board.getBlocks().map(block => {
 //     return `${block.getSize()}`
 // }) );
+
+// board.moveLeft().then(() => {
+//     console.log( board.getBlocks().map(block => {
+//         return `${block.getSize()}`
+//     }) );
+
+//     board.moveLeft().then(() => {
+//         console.log( board.getBlocks().map(block => {
+//             return `${block.getSize()}`
+//         }) );
+
+//         board.moveLeft().then(() => {
+//             console.log( board.getBlocks().map(block => {
+//                 return `${block.getSize()}`
+//             }) );
+
+//             board.moveRight().then(() => {
+//                 console.log( board.getBlocks().map(block => {
+//                     return `${block.getSize()}`
+//                 }) );
+
+//                 board.moveUp().then(() => {
+//                     console.log( board.getBlocks().map(block => {
+//                         return `${block.getSize()}`
+//                     }) );
+
+//                     board.moveDown().then(() => {
+//                         console.log( board.getBlocks().map(block => {
+//                             return `${block.getSize()}`
+//                         }) );
+//                     })
+//                 })
+//             })
+//         })
+//     })
+// })
+
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
+// board.randomlyLoadBlock();
 
 // board.randomlyLoadBlock();
 
