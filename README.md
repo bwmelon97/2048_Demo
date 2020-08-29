@@ -114,4 +114,4 @@
 
 #### # Todo
 
-* 
+* async Action / Reducer 다루는 방법 공부 (https://react.vlpt.us/using-typescript/06-ts-redux-middleware.html)
