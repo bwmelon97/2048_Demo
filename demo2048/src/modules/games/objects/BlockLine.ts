@@ -118,7 +118,7 @@ class BlockLine {
         let scoreToAdd: number = 0;
         let isLeftOrUp: boolean = true;
         switch (direction) {
-            case Direction.RIGHT: case Direction.DOWN: 
+            case 'LEFT': case 'DOWN': 
             isLeftOrUp = false; break; 
         }
 
@@ -141,8 +141,8 @@ export class RowLine extends BlockLine {
         super(order, blocks);
     }
 
-    moveLeft = (): Promise<number> => this.handleInputDirectionalKey(Direction.LEFT)    /* 왼쪽 방향키 입력 시 이루어지는 총 과정 */
-    moveRight = (): Promise<number> => this.handleInputDirectionalKey(Direction.RIGHT)  /* 오른쪽 방향키 입력 시 이루어지는 총 과정 */
+    moveLeft = (): Promise<number> => this.handleInputDirectionalKey('LEFT')    /* 왼쪽 방향키 입력 시 이루어지는 총 과정 */
+    moveRight = (): Promise<number> => this.handleInputDirectionalKey('RIGHT')  /* 오른쪽 방향키 입력 시 이루어지는 총 과정 */
 }
 
 /* 세로 줄 */
@@ -151,6 +151,6 @@ export class ColumnLine extends BlockLine {
         super(order, blocks);
     }
 
-    moveUp = (): Promise<number> => this.handleInputDirectionalKey(Direction.UP)        /* 위쪽 방향키 입력 시 이루어지는 총 과정 */
-    moveDown = (): Promise<number> => this.handleInputDirectionalKey(Direction.DOWN)    /* 아래 방향키 입력 시 이루어지는 총 과정 */
+    moveUp = (): Promise<number> => this.handleInputDirectionalKey('UP')        /* 위쪽 방향키 입력 시 이루어지는 총 과정 */
+    moveDown = (): Promise<number> => this.handleInputDirectionalKey('DOWN')    /* 아래 방향키 입력 시 이루어지는 총 과정 */
 }

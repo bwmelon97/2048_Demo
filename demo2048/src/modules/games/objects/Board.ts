@@ -73,10 +73,10 @@ class Board {
         })
     }
 
-    moveLeft = (): Promise<number> => this.handleInputDirectionalKey(Direction.LEFT)
-    moveRight = (): Promise<number> => this.handleInputDirectionalKey(Direction.RIGHT)
-    moveUp = (): Promise<number> => this.handleInputDirectionalKey(Direction.UP)
-    moveDown = (): Promise<number> => this.handleInputDirectionalKey(Direction.DOWN)
+    moveLeft = (): Promise<number> => this.handleInputDirectionalKey('LEFT')
+    moveRight = (): Promise<number> => this.handleInputDirectionalKey('RIGHT')
+    moveUp = (): Promise<number> => this.handleInputDirectionalKey('UP')
+    moveDown = (): Promise<number> => this.handleInputDirectionalKey('DOWN')
 
     /* 방향키 입력 시, rows 또는 cols의 모든 line를 각각 해당 move 함수를 실행 시키고, random Load를 1회 실행 */
     async handleInputDirectionalKey( direction: Direction ): Promise<number> {
@@ -85,19 +85,19 @@ class Board {
 
         /* 블록 이동 */
         switch (direction) {
-            case Direction.LEFT:
+            case 'LEFT':
                 movePromise = Promise.all(this.rows.map(row => row.moveLeft()))
                 break;
 
-            case Direction.RIGHT:
+            case 'RIGHT':
                 movePromise = Promise.all(this.rows.map(row => row.moveRight()));
                 break;
 
-            case Direction.UP:
+            case 'UP':
                 movePromise = Promise.all(this.cols.map(col => col.moveUp()));
                 break;
 
-            case Direction.DOWN:
+            case 'DOWN':
                 movePromise = Promise.all(this.cols.map(col => col.moveDown()));
                 break;
         }
