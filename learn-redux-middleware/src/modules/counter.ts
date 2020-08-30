@@ -1,10 +1,23 @@
 import { createAction, createReducer, ActionType } from 'typesafe-actions';
+import { Dispatch } from 'react';
 
 const INCREASE = 'INCREASE';
 const DECREASE = 'DECREASE';
 
 export const increase = createAction(INCREASE)();
 export const decrease = createAction(DECREASE)();
+
+export const increaseAsync = () => (dispatch: Dispatch<CounterAction>) => {
+    setTimeout(() => {
+        dispatch(increase());
+    }, 1000);
+}
+
+export const decreaseAsync = () => (dispatch: Dispatch<CounterAction>) => {
+    setTimeout(() => {
+        dispatch(decrease());
+    }, 1000);
+}
 
 const actions = {increase, decrease};
 

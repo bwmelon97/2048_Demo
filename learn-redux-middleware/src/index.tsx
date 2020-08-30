@@ -6,13 +6,15 @@ import * as serviceWorker from './serviceWorker';
 import { createStore, applyMiddleware } from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { Provider } from 'react-redux';
-import rootReducer from "./modules";
-// import { myLogger } from "./middlewares";
 import logger from 'redux-logger';
+import ReduxThunk from 'redux-thunk';
+
+// import { myLogger } from "./middlewares";
+import rootReducer from "./modules";
 
 const store = createStore(
     rootReducer, 
-    composeWithDevTools(applyMiddleware(logger))
+    composeWithDevTools(applyMiddleware(logger, ReduxThunk))
 );
 
 ReactDOM.render(
