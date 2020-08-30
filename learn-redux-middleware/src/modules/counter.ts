@@ -8,7 +8,7 @@ export const decrease = createAction(DECREASE)();
 
 const actions = {increase, decrease};
 
-type CounterAction = ActionType<typeof actions>;
+export type CounterAction = ActionType<typeof actions>;
 type CounterState = { count: number };
 const initialState: CounterState = { count: 0 };
 
