@@ -1,12 +1,14 @@
 import React from "react";
 
-import UseEffectExample from "./components/UseEffectExample";
+// import UseEffectExample from "./components/UseEffectExample";
+import ComponentComposition from "./components/ComponentComposition";
 
 function App () {
 
     return (
         <div>
-            <UseEffectExample something='hello' />
+            {/* <UseEffectExample something='hello' /> */}
+            <ComponentComposition />
         </div>
     )
 }
