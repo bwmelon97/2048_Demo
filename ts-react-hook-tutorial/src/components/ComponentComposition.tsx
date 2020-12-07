@@ -1,7 +1,7 @@
-import React, { ReactNode } from "react";
+import React, { useState, ReactNode } from "react";
 
 type FancyBorderProps = {
-    children: ReactNode
+    children?: ReactNode
 }
 
 function FancyBorder (props: FancyBorderProps) {
@@ -13,13 +13,49 @@ function FancyBorder (props: FancyBorderProps) {
     )
 }
 
-function WelcomeDialog () {
+type DialogProps = {
+    title: String;
+    description: String;
+    children ?: ReactNode;
+}
+
+function SkeletonDialog (props: DialogProps) {
+    const {
+        title, description, children
+    } = props;
     return (
         <FancyBorder>
-            <h1> Welcome ! </h1>
-            <p> Thanks for visiting our site :) </p>
+            <h1> { title } </h1>
+            <p> { description } </p>
+            { children && children }
         </FancyBorder>
     )
 }
 
-export default WelcomeDialog;
+// function WelcomeDialog () {
+//     return (
+//         <SkeletonDialog 
+//             title = 'Welcome !'
+//             description = 'Thanks for visiting our site :)'
+//         />
+//     )
+// }
+
+function LoginDialog () {
+    
+    const [value, setValue] = useState('');
+    const submitForm = () => { console.log(value) }
+
+    return (
+        <SkeletonDialog
+            title = ''
+            description = ''
+        >
+            <input type='text' onChange={ e => setValue(e.target.value) } />
+            <button onClick={submitForm} > 완료 </button>
+        </SkeletonDialog>
+    )
+}
+
+
+export default LoginDialog;

@@ -14,7 +14,7 @@ function SkeletonHeader (props: SkeletonHeaderProps) {
     return (
         <div>
             <div> { left  } </div>
-            { mid ? <div> { mid } </div> : '' }
+            { mid && <div> { mid } </div> }
             <div> { right } </div>
         </div>
     )
